@@ -43,13 +43,19 @@ local toolbar = plugin:CreateToolbar(PLUGIN_NAME)
 local createProjectSnippetsButton = toolbar:CreateButton(
     'Create Project Snippets',
     'Create a project snippets ModuleScript',
-    'rbxassetid://0'
+    'rbxassetid://120171915312901'
 )
 
 local triggerSnippetsButton = toolbar:CreateButton(
     'Trigger Snippets',
     'Trigger all snippets markers in the current script',
-    'rbxassetid://0'
+    'rbxassetid://120171915312901'
+)
+
+local refreshSnippetsButton = toolbar:CreateButton(
+    'Refresh Snippets',
+    'Refreshes snippets intellisense',
+    'rbxassetid://120171915312901'
 )
 
 local triggerSnippetsAction = plugin:CreatePluginAction(
@@ -216,6 +222,10 @@ end)
 
 triggerSnippetsButton.Click:Connect(function()
     replaceSnippetsMarker()
+end)
+
+refreshSnippetsButton.Click:Connect(function()
+    refreshSnippetsAutocompleteCallbacks()
 end)
 
 createProjectSnippetsButton.Click:Connect(function()
