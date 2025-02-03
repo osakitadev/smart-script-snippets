@@ -1,0 +1,12 @@
+{
+  "name": "Smart Script Snippets",
+  "tree": {
+    "$className": "DataModel",
+
+    "ServerScriptService": {
+      "SmartScriptSnippets": {
+        "$path": "src"
+      }
+    }
+  }
+}
