@@ -24,3 +24,7 @@ If you wish to contribute:
 - [] More Snippet Markers: `--@skip`, --`@stop`, ect
 - [] Custom Snippet Markers (to execute code when that marker is reached)
 - [x] Conditional Snippet Generation (`BeforeReplace` & `AfterReplace` snippet functions) `✅ 05/02/2025 | v1.1.0`
+- [] More Snippet Fields: `AllowedContext` and others
+- [] Pass the Snippet Marker arguments as argument to `BeforeReplace` and `AfterReplace` fields
+- [] GitHub repo of predefined QoL/Utility snippets
+- [] Version checker for the Roblox Studio plugin
