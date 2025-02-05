@@ -15,3 +15,12 @@ If you wish to contribute:
 - **Please use StyLua** to format your code.
 - Use the provided `.stylua.toml` file for your settings.
 - **DO NOT CHANGE ANYTHING ELSE IN THE PROJECT OTHER THAN THE PLUGIN CODE.**
+
+
+## TODO List
+- [] Global/Local Snippets
+- [] Importing/Exporting Snippets
+- [] Snippet Preview
+- [] More Snippet Markers: `--@skip`, --`@stop`, ect
+- [] Custom Snippet Markers (to execute code when that marker is reached)
+- [x] Conditional Snippet Generation (`BeforeReplace` & `AfterReplace` snippet functions) `✅ 05/02/2025 | v1.1.0`
