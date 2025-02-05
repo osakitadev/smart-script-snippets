@@ -26,7 +26,7 @@ local ScriptEditorService = game:GetService('ScriptEditorService')
 local StudioService = game:GetService('StudioService')
 local ServerStorage = game:GetService('ServerStorage')
 
-local PLUGIN_VERSION = '1.0.0'
+local PLUGIN_VERSION = '1.1.0'
 local PLUGIN_NAME = 'Smart Script Snippets ' .. PLUGIN_VERSION
 local USER_SNIPPETS_MODULE = 'ProjectSnippets'
 local SNIPPET_ARGUMENT_DELIMETER = '#'
@@ -101,7 +101,7 @@ local function refreshSnippetsAutocompleteCallbacks()
                     label = '@' .. snippet.Name,
                     preselect = true,
                     kind = Enum.CompletionItemKind.Snippet,
-                    codeSample = table.concat(snippet.Body, '\n'),
+                    codeSample = table.concat(snippet.Body or {}, '\n'),
                     documentation = {
                         value = snippet.Description,
                     },
@@ -146,13 +146,27 @@ local function parseMarkerArguments(arguments: string)
     return map
 end
 
-local function getSnippetMarkerReplacement(snippet, markerArgs): { string }
+local function canSnippetBeReplaced(snippet, lineNumber)
+    return snippet.BeforeReplace
+        and type(snippet.BeforeReplace) == 'function'
+        and snippet.BeforeReplace(StudioService.ActiveScript, lineNumber) == true
+end
+
+local function getSnippetMarkerReplacement(
+    snippet,
+    markerArgs,
+    lineNumber
+): ({ string }, boolean)
     markerArgs = parseMarkerArguments(markerArgs)
 
     local replacementStringTable = {}
 
     local snippetArguments = snippet.Args
     local snippetBody = snippet.Body
+
+    if not canSnippetBeReplaced(snippet, lineNumber) then
+        return {}, false
+    end
 
     for _, lineContent in ipairs(snippetBody) do
         local currentLineReplacement = lineContent:gsub(
@@ -173,7 +187,7 @@ local function getSnippetMarkerReplacement(snippet, markerArgs): { string }
         table.insert(replacementStringTable, currentLineReplacement)
     end
 
-    return replacementStringTable
+    return replacementStringTable, true
 end
 
 local function replaceSnippetsMarker()
@@ -182,7 +196,7 @@ local function replaceSnippetsMarker()
     local scriptContent = currentDocument.Source:split('\n')
     local newScriptContent = {}
 
-    for _, lineContent in ipairs(scriptContent) do
+    for lineNumber, lineContent in ipairs(scriptContent) do
         if not lineContent:match(MARKER_VALID_STRUCTURE) then
             table.insert(newScriptContent, lineContent)
             continue
@@ -197,10 +211,23 @@ local function replaceSnippetsMarker()
             continue
         end
 
-        local replacement = getSnippetMarkerReplacement(snippetContent, snippetMarkerArgs)
+        local replacement, didReplace =
+            getSnippetMarkerReplacement(snippetContent, snippetMarkerArgs, lineNumber)
+
+        if not didReplace then
+            table.insert(newScriptContent, lineContent) -- Don't delete the snippet marker
+            continue
+        end
 
         for _, v in ipairs(replacement) do
             table.insert(newScriptContent, v)
+        end
+
+        if
+            snippetContent.AfterReplace
+            and type(snippetContent.AfterReplace) == 'function'
+        then
+            snippetContent.AfterReplace(currentDocument, lineNumber)
         end
     end
 
